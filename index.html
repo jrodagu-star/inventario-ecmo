@@ -5754,8 +5754,14 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
   window.__setEstado=(r,v)=>{v=String(v||'').toLowerCase();setHidden(r,v==='oculto');setDeleted(r,v==='eliminado')};
   refreshMeta();
   try{const sd=document.getElementById('savedData').textContent.trim();
-    if(sd){const d=JSON.parse(sd);window.__loadSession(d,true);const f=new Date(d.fecha);const el=document.getElementById('savedInfo');
-      if(el){el.textContent='Datos guardados el '+f.toLocaleDateString('es-ES')+' a las '+f.toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'});el.hidden=false}}}catch(e){}
+    if(sd){const d=JSON.parse(sd);window.__loadSession(d,false);const f=new Date(d.fecha);const when=f.toLocaleDateString('es-ES')+' a las '+f.toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'});const el=document.getElementById('savedInfo');
+      if(el){el.textContent='Datos guardados el '+when;el.hidden=false}
+      const nRec=(d.rows||[]).filter(r=>String(r.rec||'').trim()).length;
+      const note=document.createElement('div');note.className='intro';
+      note.innerHTML='<p><strong>Sesión cargada.</strong> '+nRec+' cantidades recomendadas de '+(d.rows||[]).length+' ítems, del '+when+'.</p>';
+      const main=document.querySelector('main');const intro=main.querySelector('.intro');
+      if(intro)intro.before(note);else main.prepend(note);
+      window.__openSession=true}}catch(e){console.error(e)}
   markClean();
 
   // ===== Informe del material (HTML + PDF) =====
@@ -6210,7 +6216,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
   })();
 
   calc();
-  show(location.hash.slice(1)||panels[0].id,false);
+  show(location.hash.slice(1)||(window.__openSession?'s4':panels[0].id),false);
 })();
 </script>
 </body>
