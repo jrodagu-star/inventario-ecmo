@@ -5756,9 +5756,13 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
   try{const sd=document.getElementById('savedData').textContent.trim();
     if(sd){const d=JSON.parse(sd);window.__loadSession(d,false);const f=new Date(d.fecha);const when=f.toLocaleDateString('es-ES')+' a las '+f.toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'});const el=document.getElementById('savedInfo');
       if(el){el.textContent='Datos guardados el '+when;el.hidden=false}
-      const nRec=(d.rows||[]).filter(r=>String(r.rec||'').trim()).length;
-      const note=document.createElement('div');note.className='intro';
-      note.innerHTML='<p><strong>Sesión cargada.</strong> '+nRec+' cantidades recomendadas de '+(d.rows||[]).length+' ítems, del '+when+'.</p>';
+      const escS=s=>String(s??'').replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+      const loaded=(d.rows||[]).filter(r=>String(r.rec||'').trim());
+      const note=document.createElement('div');note.className='intro';note.id='loadedSession';
+      note.innerHTML='<p><strong>Datos del archivo.</strong> '+loaded.length+' ítems con cantidad recomendada, del '+when+'.</p>'
+        +'<div class="tbl-wrap" style="max-height:48vh;margin-top:8px"><table><thead><tr><th>Sección</th><th>Apartado</th><th>Ítem</th><th>Cantidad recomendada</th></tr></thead><tbody>'
+        +loaded.map(r=>{const p=String(r.k||'').split('||');return '<tr><td>'+escS(p[0])+'</td><td>'+escS(p[1])+'</td><td>'+escS(p[2])+'</td><td><strong>'+escS(r.rec)+'</strong></td></tr>'}).join('')
+        +'</tbody></table></div>';
       const main=document.querySelector('main');const intro=main.querySelector('.intro');
       if(intro)intro.before(note);else main.prepend(note);
       window.__openSession=true}}catch(e){console.error(e)}
